@@ -11,15 +11,21 @@ RUN apt-get -y update && \
     apt-get -y update && \
     apt-get -y install php5 
 
-RUN apt-get update && apt-get -y install curl php5-intl && service apache2 restart
+RUN apt-get update && apt-get -y install curl php5-curl php5-intl && service apache2 restart
 
-RUN mkdir /image /code_tested
+ENV TESTED_CODE="/tested_code"
+
+RUN mkdir /image /tested_code
 
 # Installing composer globally
 RUN mkdir /etc/composer/ && cd /etc/composer/ \
       && curl -s https://getcomposer.org/installer | php \
       && echo "#!/bin/bash\n/etc/composer/composer.phar \$@\n" >> /bin/composer \
       && chmod 755 /bin/composer
+
+# Installing a global ant command targeting the testing code
+RUN echo "#!/bin/bash -e\n(cd $TESTED_CODE; ./vendor/bin/phing \$@)" >> /bin/ant \
+    && chmod 755 /bin/ant
 
 ### PUT additional requirement here
 

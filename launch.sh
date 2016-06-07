@@ -11,16 +11,17 @@ if ! db_volume_exist; then
     mysql_install_db > /dev/null 2>&1
     db_wait_until_ready
 
-    db_create_user "/code_tested"
-    db_create "/code_tested" "ghostylink_test_template"
-    db_create "/code_tested/" "ghostylink_test"
-    CI_SERVER=1 /code_tested/bin/cake migrations migrate -c test_schema
+    db_create_user "$TESTED_CODE"
+    db_create "$TESTED_CODE" "ghostylink_test_template"
+    db_create "$TESTED_CODE" "ghostylink_test"
+    CI_SERVER=1 "$TESTED_CODE"/bin/cake migrations migrate -c test_schema
 else
     db_wait_until_ready
 fi
 
-cd /code_tested
-#composer install
+cd "$TESTED_CODE"
+composer install
+
 # For future // tests running
 #for ((i=0; i<=3; i++)); do
 #    # Create a new database
