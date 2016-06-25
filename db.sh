@@ -1,20 +1,56 @@
 #!/bin/bash -e
-if [[ $SCRIPT_DEV ]]; then
-    set -x
-fi
+set -x
 
 ## Wait until mysql database is ready
 function db_wait_until_ready {
-    /usr/bin/mysqld_safe > /dev/null 2>&1 &
+    /usr/bin/mysqld_safe & > /dev/null 2>&1 &    
     RET=1
     echo -e "\t=> Waiting for confirmation of MySQL service startup\n"
     while [[ RET -ne 0 ]]; do
         printf '.'
         sleep 5
-        mysql -uroot -e "status" > /dev/null 2>&1
+        mysql -uroot -e "status"
         RET=$?
     done
 }
+## Wait until the database is initialized. ie: mysql is ready and a databse is
+## created
+function db_wait_until_initialized {
+
+    local installDir="$1"    
+    if [[ $installDir = "" ]]; then
+        $installDir="$TESTED_CODE"
+    fi
+
+    local db_name='ghostylink_test_template'
+    local db_user=$(db_get_conf_for "$installDir" "username" "test_schema")
+    local db_pwd=$(db_get_conf_for "$installDir" "password" "test_schema")
+
+    db_wait_until_ready
+        
+    local sql="SHOW TABLES LIKE 'phinxlog'"    
+    table=$(mysql -u$db_user -p$db_pwd -D$db_name -N -B -e "$sql")    
+    echo $table
+    echo -e "\t=> Waiting for MySQL template test database to be created\n"
+
+    while [[ $table == "" ]]; do
+        echo "."
+        table=$(mysql -u$db_user -p$db_pwd -D$db_name -N -B -e "$sql")
+        sleep 1
+    done
+    
+    local expectedVersion=$(db_get_expected_version "$installDir")
+    local gotVersion=$(db_get_version "$installDir" "test_schema")
+
+    echo -e "\t=> Waiting for MySQL template test schema to be created\n"
+    while [[ $gotVersion != $expectedVersion ]]; do
+        echo "."
+        gotVersion=$(db_get_version "$installDir")
+        sleep 1
+    done
+
+}
+
 
 ## Upgrade the database schema
 ## @param $1 ghostylink install directory
@@ -118,10 +154,11 @@ function db_version_is_after {
 ## @param $1 ghostylink install directory
 ## @return print to stdout the installed version 
 function db_get_version {
-    local installDir=$1
-    local db_name=$(db_get_conf_for "$installDir" "database")
-    local db_user=$(db_get_conf_for "$installDir" "username")
-    local db_pwd=$(db_get_conf_for "$installDir" "password")
+    local installDir="$1"
+    local datasourceConfigKey="$2"
+    local db_name=$(db_get_conf_for "$installDir" "database" $datasourceConfigKey)
+    local db_user=$(db_get_conf_for "$installDir" "username" $datasourceConfigKey)
+    local db_pwd=$(db_get_conf_for "$installDir" "password" $datasourceConfigKey)
     
     local sql="SELECT version FROM phinxlog ORDER BY version DESC LIMIT 1"
     # Do not print line header. Run in Batch mode
@@ -144,10 +181,15 @@ function db_get_expected_version {
 ## @param $2 key to retrieve
 ## @return print to stdout the value for the key in the conf file
 function db_get_conf_for {
-    local installDir=$1
-    local key=$2
+    local installDir="$1"
+    local key="$2"
+    local datasourceKey="$3"    
+    if [[ $datasourceKey == "" ]]; then
+        datasourceKey="test"
+    fi
+
     local phpStatement="\$conf = require '$installDir/config/app_tests.php'; \
-                         print_r(\$conf['Datasources']['test']['$key']);"    
+                         print_r(\$conf['Datasources']['$datasourceKey']['$key']);"    
     local val=$(php -r "$phpStatement")
     echo "$val"
 }

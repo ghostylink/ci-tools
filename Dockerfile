@@ -24,16 +24,16 @@ RUN mkdir /etc/composer/ && cd /etc/composer/ \
       && chmod 755 /bin/composer
 
 # Installing a global ant command targeting the testing code
-RUN echo "#!/bin/bash -e\n(cd $TESTED_CODE; ./vendor/bin/phing \$@)" >> /bin/ant \
-    && chmod 755 /bin/ant
-
-### PUT additional requirement here
+# And a active db init waiting command
+RUN echo "#!/bin/bash -e\nif [[ \$BUILD_URL == \"\" ]]; then\n cd $TESTED_CODE;\n fi\n./vendor/bin/phing \$@" >> /bin/ant \
+    && chmod 755 /bin/ant \
+    && echo "#!/bin/bash -e\nsource /image/db.sh\ndb_wait_until_initialized \$TESTED_CODE" >> /bin/db_wait_init \
+    && chmod 755 /bin/db_wait_init
 
 ###
 
 COPY . /image/
 
-RUN chmod -R u+x /image
+RUN chmod -R uo+x /image
 
-EXPOSE 80
 CMD ["/image/launch.sh"]

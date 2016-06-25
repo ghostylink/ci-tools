@@ -2,13 +2,14 @@
 
 source "/image/db.sh"
 
-sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" \
-        -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php5/apache2/php.ini
-
+if [[ ! -d "$TESTED_CODE/bin" ]]; then
+    # Considere current directory as the code to be tested
+    export TESTED_CODE="."
+fi    
 if ! db_volume_exist; then    
-    echo -e "\t=> Installing MySQL volume ...\n"
+    echo -e "\t=> Installing MySQL volume ...\n"        
 
-    mysql_install_db > /dev/null 2>&1
+    mysql_install_db
     db_wait_until_ready
 
     db_create_user "$TESTED_CODE"
@@ -31,5 +32,4 @@ composer install
 #
 #done 
 
-mysqladmin -uroot shutdown
-exec supervisord -n
+exit
