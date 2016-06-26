@@ -6,6 +6,9 @@ if [[ ! -d "$TESTED_CODE/bin" ]]; then
     # Considere current directory as the code to be tested
     export TESTED_CODE="."
 fi    
+
+cd "$TESTED_CODE" && composer install -n
+
 if ! db_volume_exist; then    
     echo -e "\t=> Installing MySQL volume ...\n"        
 
@@ -20,9 +23,6 @@ else
     db_wait_until_ready
 fi
 
-cd "$TESTED_CODE"
-composer install
-
 # For future // tests running
 #for ((i=0; i<=3; i++)); do
 #    # Create a new database
@@ -31,5 +31,4 @@ composer install
 #    db_create "/code_tested/" "$db_name"
 #
 #done 
-
-exit
+exec supervisord -n
