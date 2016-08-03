@@ -25,7 +25,7 @@ RUN mkdir /etc/composer/ && cd /etc/composer/ \
 
 # Installing a global ant command targeting the testing code
 RUN echo "#!/bin/bash -e\nif [[ \$BUILD_URL == \"\" ]]; then\n cd \$TESTED_CODE;\n fi\n./vendor/bin/phing \$@" >> /bin/ant \
-    && chmod 755 /bin/ant
+    && chmod 755 /bin/ant && adduser jenkins
 
 ###
 
