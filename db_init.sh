@@ -7,8 +7,6 @@ if [[ ! -d "$TESTED_CODE/bin" ]]; then
     export TESTED_CODE="."
 fi    
 
-cd "$TESTED_CODE" && composer install -n && chown -R jenkins:jenkins ./vendor
-
 if ! db_volume_exist; then    
     echo -e "\t=> Installing MySQL volume ...\n"        
 

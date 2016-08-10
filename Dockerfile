@@ -17,15 +17,9 @@ ENV TESTED_CODE="/tested_code" CI_SERVER=1
 
 RUN mkdir /image /tested_code
 
-# Installing composer globall
-RUN mkdir /etc/composer/ && cd /etc/composer/ \
-      && curl -s https://getcomposer.org/installer | php \
-      && echo "#!/bin/bash\n/etc/composer/composer.phar \$@\n" >> /bin/composer \
-      && chmod 755 /bin/composer
-
 # Installing a global ant command targeting the testing code
 RUN echo "#!/bin/bash -e\nif [[ \$BUILD_URL == \"\" ]]; then\n cd \$TESTED_CODE;\n fi\n./vendor/bin/phing \$@" >> /bin/ant \
-    && chmod 755 /bin/ant && adduser jenkins
+    && chmod 755 /bin/ant
 
 ###
 
