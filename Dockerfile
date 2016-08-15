@@ -13,7 +13,7 @@ RUN apt-get -y update && \
     pecl install xdebug && \
     echo "zend_extension=$(find /usr/lib/php5/ -name xdebug.so)" >> /etc/php5/cli/php.ini 
 
-ENV TESTED_CODE="/tested_code" CI_SERVER=1
+ENV TESTED_CODE="/tested_code" CI_SERVER=1 CI_FROM_DOCKER=1
 
 RUN mkdir /image /tested_code
 
@@ -22,6 +22,7 @@ RUN echo "#!/bin/bash -e\nif [[ \$BUILD_URL == \"\" ]]; then\n cd \$TESTED_CODE;
     && chmod 755 /bin/ant
 
 ###
+EXPOSE 80
 
 COPY . /image/
 
