@@ -4,7 +4,12 @@ source /image/db.sh
 
 if [[ ! -d "$TESTED_CODE/bin" ]]; then
     # Considere current directory as the code to be tested
-    export TESTED_CODE="."
+    if [[ "$BUILD_TAG" == "" ]]; then
+        export TESTED_CODE="."
+    else
+        export TESTED_CODE="$PWD"
+    fi
+    echo "tested code $TESTED_CODE"
 fi    
 
 if ! db_volume_exist; then    
