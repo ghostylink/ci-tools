@@ -10,7 +10,7 @@ if [[ "$BUILD_TAG" == "" ]]; then
 else
     cp -R "$TESTED_CODE" /var/www/html/ghostylink
     chown -R www-data:www-data /var/www/html/ghostylink
-    sed -i s/__tbr__maildev/"maildev-$BUILD_TAG"/ /etc/apache2/sites-available/000-default.conf
+    sed -i s/__tbr__maildev/"maildev-$BUILD_TAG"/ /image/apache-conf/default.conf
 fi
 cp /image/apache-conf/default.conf /etc/apache2/sites-available/000-default.conf
 
