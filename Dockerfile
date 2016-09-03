@@ -17,10 +17,6 @@ ENV TESTED_CODE="/tested_code" CI_SERVER=1 CI_FROM_DOCKER=1
 
 RUN mkdir /image /tested_code
 
-# Installing a global ant command targeting the testing code
-RUN echo "#!/bin/bash -e\nif [[ \$BUILD_URL == \"\" ]]; then\n cd \$TESTED_CODE;\n fi\n./vendor/bin/phing \$@" >> /bin/ant \
-    && chmod 755 /bin/ant
-
 ###
 EXPOSE 80
 

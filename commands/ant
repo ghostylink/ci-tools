@@ -1,0 +1,8 @@
+#!/bin/bash -e
+if [[ $BUILD_URL == "" ]]; then
+    export MAILDEV_HOST="localhost"
+    cd $TESTED_CODE;
+else
+    export MAILDEV_HOST="maildev-$BUILD_TAG"
+fi
+./vendor/bin/phing $@
