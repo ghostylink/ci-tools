@@ -8,7 +8,8 @@ MAINTAINER Kevin REMY <kevanescence@hotmail.fr>
 RUN apt-get -y update && \
     apt-get -y install software-properties-common python-software-properties && \
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php5-5.6 && apt-get -y update  && \    
-    apt-get -y install php5 curl php5-dev php5-curl php5-intl && \
+    apt-get -y install php5 curl php5-dev php5-curl php5-intl npm && \
+    npm install -g bower && \
     service apache2 restart && \
     pecl install xdebug && \
     echo "zend_extension=$(find /usr/lib/php5/ -name xdebug.so)" >> /etc/php5/cli/php.ini 
