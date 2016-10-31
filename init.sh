@@ -2,7 +2,7 @@
 
 source /image/db_init.sh
 
-if [[ "$BUILD_TAG_SAFE" == "" ]]; then
+if [[ "$BUILD_TAG" == "" ]]; then
     ln -s "$TESTED_CODE" /var/www/html/ghostylink
     chmod -R 777 "$TESTED_CODE/tmp"
     chmod -R 777 "$TESTED_CODE/logs"
