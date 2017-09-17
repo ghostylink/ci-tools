@@ -12,12 +12,10 @@ else
     if [[ "$BUILD_TAG_SAFE" == "" ]]; then
         BUILD_TAG_SAFE="$BUILD_TAG"
     fi
-    cp -R "$TESTED_CODE" /var/www/html/ghostylink
-    chown -R www-data:www-data /var/www/html/ghostylink
+    ln -s "$TESTED_CODE" /var/www/html/ghostylink
+    #chown -R www-data:www-data /var/www/html/ghostylink
     sed -i s/__tbr__maildev/"maildev-$BUILD_TAG_SAFE"/ /image/apache-conf/default.conf
 fi
 cp /image/commands/* /bin
 chmod -R 755 /bin
 cp /image/apache-conf/default.conf /etc/apache2/sites-available/000-default.conf
-
-service apache2 start

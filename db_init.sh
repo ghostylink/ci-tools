@@ -14,8 +14,7 @@ fi
 
 if ! db_volume_exist; then    
     echo -e "\t=> Installing MySQL volume ...\n"        
-
-    mysql_install_db
+    
     db_wait_until_ready
 
     db_create_user "$TESTED_CODE"

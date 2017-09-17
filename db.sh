@@ -2,8 +2,7 @@
 set -x
 
 ## Wait until mysql database is ready
-function db_wait_until_ready {
-    /usr/bin/mysqld_safe & > /dev/null 2>&1 &    
+function db_wait_until_ready {    
     RET=1
     echo -e "\t=> Waiting for confirmation of MySQL service startup\n"
     while [[ RET -ne 0 ]]; do
@@ -29,13 +28,13 @@ function db_wait_until_initialized {
     db_wait_until_ready
         
     local sql="SHOW TABLES LIKE 'phinxlog'"    
-    table=$(mysql -u$db_user -p$db_pwd -D$db_name -N -B -e "$sql")    
+    table=$(mysql -u"$db_user" -p"$db_pwd" -D"$db_name" -N -B -e "$sql")    
     echo $table
     echo -e "\t=> Waiting for MySQL template test database to be created\n"
 
     while [[ $table == "" ]]; do
         echo "."
-        table=$(mysql -u$db_user -p$db_pwd -D$db_name -N -B -e "$sql")
+        table=$(mysql -u"$db_user" -p"$db_pwd" -D"$db_name" -N -B -e "$sql")
         sleep 1
     done
     
@@ -56,15 +55,15 @@ function db_wait_until_initialized {
 ## @param $1 ghostylink install directory
 ## @return void
 function db_upgrade {
-    local installDir=$1    
-    $installDir/bin/cake migrations migrate
+    local installDir="$1"    
+    "$installDir/bin/cake" migrations migrate
 }
 
 ## Check if db exist 
 ## @return true if the db exist, false otherwise
 function db_volume_exist { 
     local VOLUME_HOME="/var/lib/mysql"
-    if [[ ! -d $VOLUME_HOME/mysql ]]; then
+    if [[ ! -d "$VOLUME_HOME/mysql/ghostylink" ]]; then
         return 1
     else
         return 0
